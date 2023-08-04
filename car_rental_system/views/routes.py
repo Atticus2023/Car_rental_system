@@ -5,6 +5,7 @@ import MySQLdb.cursors
 import re
 import bcrypt
 
+
 @app.route("/car")
 def car():
     return "car"
