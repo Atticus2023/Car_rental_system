@@ -6,15 +6,17 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Welcome <a href="{{ url_for('user_details') }}"> {{ username }}</a> !</h1>
+    <h1>Welcome <a href="{{ url_for('routes.user_details') }}"> {{ username }}</a> !</h1>
 
     <nav>
         
-        <a href="{{ url_for('car_list') }}">Car List</a>
+        <a href="{{ url_for('routes.car_list') }}">Car List</a>
         
-        <a href="{{ url_for('customer_list') }}">Customer List</a>
+        <a href="{{ url_for('routes.customer_list') }}">Customer List</a>
         
-        <a href="{{ url_for('staff_list') }}">Staff List</a>
+        <a href="{{ url_for('routes.staff_list') }}">Staff List</a>
+
+        <a href="{{ url_for('auth.logout') }}">Log out</a>
     </nav>
 
 </body>

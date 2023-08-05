@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}My Page{% endblock %}
+
+{% block content %}
+<h1>update</h1>
+<form action="{{ url_for('routes.update_profile')}}" method="POST">
+    <input type="text" name="new_username" value="{{username}}" id="new_username">
+    <input type="password" name="new_password" id="new_password">
+    <input type="text" name="new_user_first_name" value="{{ user_details[2] }}" id="new_user_first_name">
+    <input type="text" name="new_user_last_name" value="{{ user_details[3] }}" id="new_user_last_name">
+    <input type="text" name="new_user_address" value="{{ user_details[4] }}" id="new_user_address">
+    <input type="text" name="new_email" value="{{ email }}" id="new_email">
+    <input type="text" name="new_user_phone_number" value="{{ user_details[5] }}" id="new_user_phone_number">
+    <input type="submit">
+</form>
+{% endblock %}

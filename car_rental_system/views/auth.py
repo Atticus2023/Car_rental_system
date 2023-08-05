@@ -1,28 +1,17 @@
-from flask import render_template, redirect, request, url_for, session, flash
-from car_rental_system import app
-from flask_mysqldb import MySQL
+from flask import Blueprint, render_template, redirect, request, url_for, session, flash
+from car_rental_system.db import mysql
 import MySQLdb.cursors
 import re
 import bcrypt
 
+auth = Blueprint('auth', __name__)
 
-app.secret_key = "car_rental_system"
 
-# Database connection details below
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'lincoln2023'
-app.config['MYSQL_DB'] = 'car_rental_system'
-app.config['MYSQL_PORT'] = 3306
-
-# Intialize MySQL
-mysql = MySQL(app)
-
-@app.route("/")
+@auth.route("/")
 def index():
     return render_template("index.html")
 
-@app.route('/register', methods=['GET', 'POST'])
+@auth.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
@@ -30,13 +19,12 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         email = request.form.get("email")
-        print(username)
-        print(password)
-        print(email)
+       
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         account = cursor.fetchone()
+        cursor.close()
         # If account exists show error and validation checks
         if account:
             msg = 'Account already exists!'
@@ -49,9 +37,18 @@ def register():
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s,%s)', (username, hashed, email, 'admin'))
+            
+            # Just customer need to register, for staffs, admin add them to mysql
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s,%s)', (username, hashed, email, 'customer'))
+            mysql.connection.commit()
+            # Get user_ID, then insert to table customer
+            user_ID = cursor.lastrowid
+            print (user_ID)
+            cursor.execute('INSERT INTO customers (user_ID, customer_first_name, customer_last_name, customer_phone_number) VALUES (%s, %s, %s, %s)', (user_ID, 'Customer', 'Customer', '0000000'))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
+            cursor.close()
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
@@ -59,7 +56,7 @@ def register():
     return render_template('register.html', msg=msg)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@auth.route('/login', methods=['GET', 'POST'])
 def login():
     # Output message if something goes wrong...
     msg = ''
@@ -73,6 +70,7 @@ def login():
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         # Fetch one record and return result
         account = cursor.fetchone()
+        cursor.close()
         print(account)
         if account is not None:
             password = account['password']
@@ -83,6 +81,7 @@ def login():
                 session['user_ID'] = account['user_ID']
                 session['username'] = account['username']
                 session['user_type'] = account['user_type']
+                session['email'] = account['email']
                 if session['user_type'] == 'admin':
                     return render_template("admin_dashboard.html", username = username)
                 elif session['user_type'] == 'staff':
@@ -98,12 +97,16 @@ def login():
     # Show the login form with message (if any)
     return render_template('login.html', msg=msg)
 
-# http://localhost:5000/logout - this will be the logout page
-@app.route('/logout')
+
+@auth.route('/logout')
 def logout():
     # Remove session data, this will log the user out
    session.pop('loggedin', None)
-   session.pop('id', None)
+   session.pop('user_ID', None)
    session.pop('username', None)
+   session.pop('user_type', None)
+   session.pop('email', None)
    # Redirect to login page
-   return redirect(url_for('login'))
+   return redirect(url_for('auth.login'))
+
+

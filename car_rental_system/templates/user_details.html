@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}My Page{% endblock %}
+
+{% block content %}
+    <h1>Hello {{ username }}</h1>
+    <p>user ID: {{ user_details[1] }}</p>
+    <p>user Name: {{ user_details[2] }} {{ user_details[3] }}</p>
+    <p>Address: {{ user_details[4] }}</p>
+    <p>E-mail: {{ email }}</p>
+    <p>Phone Num: {{ user_details[5] }}</p>
+
+    <a href="{{ url_for('routes.update_profile')}}">Update profile</a>
+{% endblock %}
