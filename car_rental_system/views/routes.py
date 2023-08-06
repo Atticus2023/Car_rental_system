@@ -23,11 +23,16 @@ def user_details():
         user_details = cursor.fetchone()
         cursor.close()
     print(user_details)
-    return render_template("user_details.html", user_details=user_details, user_ID = session.get('user_ID'), username = session.get('username'), email = session.get('email'))
+    return render_template("user_details.html", user_details=user_details, user_ID = session.get('user_ID'), username = session.get('username'), email = session.get('email'), user_type = session.get('user_type'))
 
 @routes.route("/car_list")
 def car_list():
-    pass
+    user_type = session.get('user_type')
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT * FROM cars')
+    cars = cursor.fetchall()
+    print(user_type)
+    return render_template("car_list.html", cars=cars, user_type=user_type)
 
 @routes.route("/staff_list")
 def staff_list():

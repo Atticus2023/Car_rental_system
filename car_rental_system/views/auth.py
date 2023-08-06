@@ -28,12 +28,21 @@ def register():
         # If account exists show error and validation checks
         if account:
             msg = 'Account already exists!'
+        elif len(email) > 50:
+            msg = 'Email address is too long!'
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             msg = 'Invalid email address!'
+        elif len(username) > 50:
+            msg = 'Username is too long!'
         elif not re.match(r'[A-Za-z0-9]+', username):
             msg = 'Username must contain only characters and numbers!'
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
+        elif len(password) < 6 or len(password) > 20:
+            msg = 'Password must be between 6 and 20 characters!'
+        # Check is there any space in password
+        elif re.search(r'\s', password):
+            msg = 'Password cannot contain spaces!'
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -47,8 +56,9 @@ def register():
             print (user_ID)
             cursor.execute('INSERT INTO customers (user_ID, customer_first_name, customer_last_name, customer_phone_number) VALUES (%s, %s, %s, %s)', (user_ID, 'Customer', 'Customer', '0000000'))
             mysql.connection.commit()
-            msg = 'You have successfully registered!'
             cursor.close()
+            flash('You have successfully registered!')
+            return redirect(url_for('auth.login'))
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
