@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 
-{% block link1 %}
-<a class="nav-link" href="#">Intrtion</a>
-{% endblock %}
+{% block link %}
+<li class="nav-item me-5">
+    <a class="nav-link " aria-current="page" href="{{url_for('auth.index')}}">Introduction</a>
+</li>
+<li class="nav-item me-5">
+    <a class="nav-link active" href="{{url_for('auth.login')}}">Login</a>
+</li>
 
-{% block link2 %}
-<a class="nav-link active" href="{{url_for('auth.login')}}">Login</a>
-{% endblock %}
-
-{% block link3 %}
-<a class="nav-link" href="{{url_for('auth.register')}}">Register</a>
+<li class="nav-item me-5">
+    <a class="nav-link" href="{{url_for('auth.register')}}">Register</a>
+</li>
 {% endblock %}
 
 {% block content %}
@@ -30,15 +31,15 @@
 
 <form action="{{url_for('auth.login')}}" method="POST" style="width: 400px; margin: 100px auto">
     <div class="mb-3">
-        <label for="username" class="form-label text-light">Username</label>
+        <label for="username" class="form-label text-dark">Username</label>
         <input type="text" name="username" class="form-control" id="username" aria-describedby="usernameHelp">
         <!-- <div id="username" class="form-text">Please enter your username. It should be unique and alphanumeric.</div> -->
     </div>
     <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label text-light">Password</label>
+        <label for="exampleInputPassword1" class="form-label text-dark">Password</label>
         <input type="password" name="password" class="form-control" id="exampleInputPassword1">
     </div>
-    <button type="submit" class="btn btn-primary">Login</button>
+    <button type="submit" class="btn btn-outline-secondary " style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Login</button>
 </form>
 
 {% endblock %}

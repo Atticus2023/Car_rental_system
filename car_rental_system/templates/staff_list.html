@@ -1,0 +1,29 @@
+{% extends "base_routes.html" %}
+
+
+
+{% block content %}
+<table>
+    <tr>
+        <th>username</th>
+        <th>staff name</th>
+        <th>address</th>
+        <th>email</th>
+        <th>Phone Number</th>
+    </tr>
+    {% for staff in staffs %}
+    <tr>
+        <td>{{staff[1]}}</td>
+        <td>{{staff[2]}} {{staff[3]}}</td>
+        <td>{{staff[4]}}</td>
+        <td>{{staff[5]}}</td>
+        <td>{{staff[6]}}</td>
+        <td><a href="{{url_for('routes.staff_edit', user_ID=staff[0])}}">Edit</a></td>
+        <td><a href="{{url_for('routes.staff_delete', user_ID=staff[0])}}">Delete</a></td>
+    </tr>
+
+    {% endfor %}
+
+    <a href="{{url_for('routes.staff_add')}}">Add</a>
+</table>
+{% endblock %}

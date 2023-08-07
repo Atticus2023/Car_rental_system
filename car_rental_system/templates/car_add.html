@@ -1,0 +1,59 @@
+{% extends "base_routes.html" %}
+
+{% block content %}
+<div class="msg">{{ msg }}</div>
+<div class="container-fluid d-flex justify-content-center mt-5">
+    <div class="card border-light" style="width: 35rem;">
+        <div class="card-body">
+            <div class="container" style="width: 90%;">
+                <form action="{{url_for('routes.car_add')}}" method="POST" class="row g-3">
+                    <div class="col-12">
+                        <label for="license_plate" class="form-label text-dark">License plate</label>
+                        <input type="text" name="license_plate" class="form-control"
+                            id="license_plate" maxlength="15">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="make" class="form-label text-dark">Make</label>
+                        <input type="text" name="make" class="form-control " id="make" maxlength="50">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="model" class="form-label text-dark">Model</label>
+                        <input type="text" name="model"  class="form-control"
+                            id="model" maxlength="50" >
+                    </div>
+                    <div class="col-12">
+                        <label for="year" class="form-label text-dark">Year</label>
+                        <input type="text" name="year"  class="form-control"
+                            id="year" pattern='^\d{4}$'>
+                    </div>
+                    <div class="col-12">
+                        <label for="seating_capacity" class="form-label text-dark">Seating capacity</label>
+                        <input type="text" name="seating_capacity"
+                            class="form-control" id="seating_capacity" pattern="^[1-9]\d*$">
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <label for="price_per_day" class="form-label text-dark">Rental Price</label>
+                        <input type="text" name="price_per_day"  class="form-control"
+                            id="price_per_day"  pattern="^\d+(\.\d+)?$">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="transmission" class="form-label text-dark">Transmission</label>
+                        <select name="transmission">
+                            <option value="automatic">automatic</option>
+                            <option value="automatic">manual</option>
+                        </select>
+                    </div>
+
+               
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

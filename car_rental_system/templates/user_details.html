@@ -1,48 +1,44 @@
-{% extends "base.html" %}
+{% extends "base_routes.html" %}
 
-{% block link1 %}
-<a class="nav-link active" href="{{ url_for('routes.car_list') }}">CAR</a>
-{% endblock %}
-
-{% block link4 %}
-<a class="nav-link" href="{{ url_for('auth.logout') }}">LOGOUT</a>
-{% endblock %}
-
-{% block link5 %}
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" aria-expanded="false"><img
-            src="../static/images/member.png" alt="User" width="35" class="d-inline-block align-text-top">
-        <span class="h6 text-dark">{{username}}</span>
-    </a>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item text-primary" href="{{ url_for('routes.user_details')}}">Profile</a></li>
-        <li><a class="dropdown-item text-primary" href="{{ url_for('routes.update_profile')}}">Update profile</a></li>
-        <li><a class="dropdown-item text-primary" href="#">Change Password</a></li>
-    </ul>
-</li>
-{% endblock %}
-
-{% if user_type == 'staff' %}
-
-{% block link2 %}
-<a class="nav-link" href="{{ url_for('routes.customer_list') }}">CUSTOMER</a>
-{% endblock %}
-
-{% elif user_type == 'admin' %}
-{% block link3 %}
-<a class="nav-link" href="{{ url_for('routes.staff_list') }}">STAFF</a>
-{% endblock %}
-
-
-
-
-{% endif %}
 
 {% block content %}
-    <h1>Hello {{ username }}</h1>
-    <p>user ID: {{ user_details[1] }}</p>
-    <p>user Name: {{ user_details[2] }} {{ user_details[3] }}</p>
-    <p>Address: {{ user_details[4] }}</p>
-    <p>E-mail: {{ email }}</p>
-    <p>Phone Num: {{ user_details[5] }}</p>
+<div class="container text-center mt-5">
+
+
+    <div class=" row d-flex justify-content-center align-items-center">
+        <div class="col-md-8">
+            <table class="table table-hover texg-lg text-light">
+                <thead class="table-light">
+                    <tr>
+                        <th colspan="2">User Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">First Name</th>
+                        <td>{{ user_details[2] }}</td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">Last Name</th>
+                        <td>{{ user_details[3] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Address</th>
+                        <td>{{ user_details[4] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td>{{ email }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Phone</th>
+                        <td>{{ user_details[5] }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
