@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, request, url_for, session, flash
-from car_rental_system.db import mysql
+from car_rental_system import mysql
 import MySQLdb.cursors
 import re
 import bcrypt

@@ -6,17 +6,17 @@
 <div>{{msg}}</div>
 <form action="{{url_for('routes.staff_add')}}" method="POST" style="width: 400px; margin: 100px auto">
     <div class="mb-3">
-        <label for="username" class="form-label text-light">Username</label>
+        <label for="username" class="form-label text-dark">Username</label>
         <input type="text" name="username" class="form-control" id="username" required pattern="^[a-zA-Z0-9]+$"
             aria-describedby="usernameHelp">
-        <div id="usernameHelp" class="form-text text-light">Username please use letters or numbers.</div>
+        <div id="usernameHelp" class="form-text text-dark">Username please use letters or numbers.</div>
         <div class="invalid-feedback">
             Password must be between 6 and 20 characters long and should not contain space.
         </div>
         <!-- <div id="username" class="form-text">Please enter your username. It should be unique and alphanumeric.</div> -->
     </div>
     <div class="mb-3">
-        <label for="inputPassword6" class="form-label text-light">Password</label>
+        <label for="inputPassword6" class="form-label text-dark">Password</label>
         <input type="password" name="password" class="form-control " id="inputPassword6" required minlength="6"
             maxlength="20" pattern="^[^\s]+$">
         <div class="invalid-feedback">
@@ -24,10 +24,10 @@
         </div>
     </div>
     <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label text-light">Email address</label>
+        <label for="exampleInputEmail1" class="form-label text-dark">Email address</label>
         <input type="email" name="email" class="form-control" id="exampleInputEmail1" required
             aria-describedby="emailHelp">
-        <div id="emailHelp" class="form-text text-light">We'll never share your email with anyone else.</div>
+        <div id="emailHelp" class="form-text text-dark">We'll never share your email with anyone else.</div>
 
     </div>
     <button type="submit" class="btn btn-primary">Register</button>

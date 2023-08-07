@@ -1,7 +1,39 @@
 {% extends "base_routes.html" %}
 
-
-
 {% block content %}
+
+{% if user_type == 'admin' %}
+<nav class="navbar navbar-expand-lg  bg-body-tertiary ">
+    <div class="container-fluid justify-content-center">
+        <a class="navbar-brand  ms-5 px-5 " href="{{url_for('routes.customer_add')}}"><span
+                class="fs-6 text-decoration-underline">ADD Customer</span> </a>
+
+    </div>
+</nav>
+{% endif %}
+<div>{{msg}}</div>
+<div class="row row-cols-1 row-cols-md-5 g-3">
+    {% for customer in customers %}
+    <div class="col">
+        <div class="card">
+            <img src="../static/images/member.png" class="card-img-top " style="width: 90px;" alt="car">
+            <div class="card-body">
+                <p>Username: {{customer[1]}}</p>
+                <p>Customer name: {{customer[3]}} {{customer[4]}}</p>
+                <p>Address: {{customer[5]}}</p>
+                <p>Email: {{customer[2]}}</p>
+                <p>Phone number: {{customer[6]}}</p>
+                
+                {% if user_type == 'admin'  %}
+                <a href="{{url_for('routes.customer_edit', user_ID=customer[0]) }}" class="card-link">Edit</a>
+                <a href="{{url_for('routes.customer_delete', user_ID=customer[0]) }}" class="card-link">Delete</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
 
 {% endblock %}

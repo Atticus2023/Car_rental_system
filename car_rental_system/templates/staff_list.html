@@ -2,28 +2,35 @@
 
 
 
-{% block content %}
-<table>
-    <tr>
-        <th>username</th>
-        <th>staff name</th>
-        <th>address</th>
-        <th>email</th>
-        <th>Phone Number</th>
-    </tr>
-    {% for staff in staffs %}
-    <tr>
-        <td>{{staff[1]}}</td>
-        <td>{{staff[2]}} {{staff[3]}}</td>
-        <td>{{staff[4]}}</td>
-        <td>{{staff[5]}}</td>
-        <td>{{staff[6]}}</td>
-        <td><a href="{{url_for('routes.staff_edit', user_ID=staff[0])}}">Edit</a></td>
-        <td><a href="{{url_for('routes.staff_delete', user_ID=staff[0])}}">Delete</a></td>
-    </tr>
+{% block content %}<div>{{msg}}</div>
+<nav class="navbar navbar-expand-lg  bg-body-tertiary ">
+    <div class="container-fluid justify-content-center">
+        <a class="navbar-brand  ms-5 px-5 " href="{{url_for('routes.staff_add')}}"><span
+                class="fs-6 text-decoration-underline">ADD Staff</span> </a>
 
+    </div>
+</nav>
+
+<div class="row row-cols-1 row-cols-md-5 g-3">
+    {% for staff in staffs %}
+    <div class="col">
+        <div class="card">
+            <img src="../static/images/member.png" class="card-img-top" style="width: 90px;" alt="car">
+            <div class="card-body">
+                <p>Username: {{staff[1]}}</p>
+                <p>Staff name: {{staff[3]}} {{staff[4]}}</p>
+                <p>Address: {{staff[5]}}</p>
+                <p>Email: {{staff[2]}}</p>
+                <p>Phone number: {{staff[6]}}</p>
+
+                {% if user_type == 'admin' %}
+                <a href="{{url_for('routes.staff_edit', user_ID=staff[0]) }}" class="card-link">Edit</a>
+                <a href="{{url_for('routes.staff_delete', user_ID=staff[0]) }}" class="card-link">Delete</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
     {% endfor %}
 
-    <a href="{{url_for('routes.staff_add')}}">Add</a>
-</table>
 {% endblock %}
