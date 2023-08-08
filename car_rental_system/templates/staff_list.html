@@ -13,6 +13,7 @@
 
 <div class="row row-cols-1 row-cols-md-5 g-3">
     {% for staff in staffs %}
+    
     <div class="col">
         <div class="card">
             <img src="../static/images/member.png" class="card-img-top" style="width: 90px;" alt="car">
@@ -23,9 +24,12 @@
                 <p>Email: {{staff[2]}}</p>
                 <p>Phone number: {{staff[6]}}</p>
 
-                {% if user_type == 'admin' %}
+                {% if staff[0] == 1 %}
+                <a href="{{url_for('routes.staff_edit', user_ID=staff[0]) }}" class="card-link">Edit</a>
+                {% else %}
                 <a href="{{url_for('routes.staff_edit', user_ID=staff[0]) }}" class="card-link">Edit</a>
                 <a href="{{url_for('routes.staff_delete', user_ID=staff[0]) }}" class="card-link">Delete</a>
+                
                 {% endif %}
             </div>
 

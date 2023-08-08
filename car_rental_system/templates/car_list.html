@@ -19,7 +19,7 @@
             <img src="../static/images/background.jpeg" class="card-img-top" alt="car">
             <div class="card-body">
                 <p>Make: {{car[2]}}</p>
-                <p>Model: {{car[6]}}</p>
+                <p>Price per Day: {{car[6]}}</p>
                 <a href="{{url_for('routes.car_details', car_ID=car[0]) }}" class="card-link">Details</a>
                 {% if user_type == 'admin' or user_type == 'staff' %}
                 <a href="{{url_for('routes.car_edit', car_ID=car[0]) }}" class="card-link">Edit</a>

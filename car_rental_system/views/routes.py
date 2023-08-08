@@ -25,6 +25,18 @@ def staff_required(func):
         return func(*args, **kwargs)
     return decorated_function
 
+@routes.route("/home")
+def home():
+    if session.get('user_type') == 'admin':
+        return render_template("admin_dashboard.html", username = session.get('username'))
+    elif session.get('user_type') == 'staff':
+        return render_template("staff_dashboard.html", username = session.get('username'))
+    elif session.get('user_type') == 'customer':
+        return render_template("customer_dashboard.html", username = session.get('username'))
+    else:
+        return render_template('login.html')
+
+
 @routes.route("/user_details")
 def user_details():
     if not session.get('loggedin'):
@@ -76,44 +88,43 @@ def update_profile():
         new_email = request.form.get("new_email")
         new_user_phone_number = request.form.get("new_user_phone_number")
 
-        cursor.execute('SELECT username FROM users WHERE user_ID <> %s', (user_ID,))
+        cursor.execute('SELECT username FROM users WHERE username=%s AND user_ID <> %s', (new_username,user_ID,))
         usernames = cursor.fetchall()
-        print(new_username)
+        
         if new_username in usernames:
             msg = 'This username already exists!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif len(new_username) > 50:
             msg = 'Username is too long!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif not re.match(r'[A-Za-z0-9]+', new_username):
             msg = 'Username must contain only characters and numbers!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif len(new_user_first_name) > 50 or len(new_user_last_name) > 50 :
             msg = 'Name too long!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif not re.match(r'^[a-zA-Z]+$', new_user_first_name) :
             msg = 'Name not just letters!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif not re.match(r'^[a-zA-Z]+$', new_user_last_name):
             msg = 'Name not just letters!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif len(new_user_address) > 250:
             msg = 'Adress is too long!'
         elif len(new_email) > 50:
             msg = 'Email address is too long!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', new_email):
             msg = 'Invalid email address!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif len(new_user_phone_number) > 20:
             msg = 'Phone number is too long!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         elif not re.match(r'^\d+$', new_user_phone_number):
             msg = 'Invalid phone number!'
-            return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
+            
         else:
-            msg = "Success!"
-            print(msg)
+            
             cursor.execute('UPDATE users SET username=%s, email=%s WHERE user_ID=%s', (new_username, new_email, user_ID))
             mysql.connection.commit()
          
@@ -132,20 +143,13 @@ def update_profile():
             cursor.execute('UPDATE staffs SET staff_first_name=%s, staff_last_name=%s, staff_address=%s, staff_phone_number=%s WHERE user_ID=%s', (new_user_first_name, new_user_last_name, new_user_address, new_user_phone_number, user_ID))
             mysql.connection.commit()
             cursor.close() 
-            msg = "Success staff!"
-            print(msg)
-            print(new_user_first_name)
             return redirect(url_for('routes.user_details'))
         
         elif user_type == "customer":
             cursor.execute('UPDATE customers SET customer_first_name=%s, customer_last_name=%s, customer_address=%s, customer_phone_number=%s WHERE user_ID=%s', (new_user_first_name, new_user_last_name, new_user_address, new_user_phone_number, user_ID))
             mysql.connection.commit()
             cursor.close() 
-            msg = "Success cus!"
-            print(msg)
             return redirect(url_for('routes.user_details'))
-       
-    print(msg)
     return render_template("update_profile.html", user_details = user_details, username = username, email = email, user_type=user_type,msg=msg)
 
 @routes.route("/car_list")
@@ -157,7 +161,6 @@ def car_list():
     cursor = mysql.connection.cursor()
     cursor.execute('SELECT * FROM cars')
     cars = cursor.fetchall()
-    print(cars)
     cursor.close()
     return render_template("car_list.html", cars=cars, username = session.get('username'), user_type=user_type)
 
@@ -189,37 +192,37 @@ def car_add():
         price_per_day = request.form.get('price_per_day')
         transmission = request.form.get('transmission')
         current_year = datetime.now().year        
-        print(seating_capacity)
+        
         cursor = mysql.connection.cursor()
-        cursor.execute('SELECT license_plate FROM cars')
-        license_plates = cursor.fetchall()
-        if license_plate in license_plates:
+        cursor.execute('SELECT license_plate FROM cars WHERE license_plate = %s', (license_plate,))
+        result = cursor.fetchall()
+        
+        if result:
             msg = 'This license_plate already exists!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
         elif len(license_plate) > 15:
             msg = 'License_plate is too long!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif not re.match(r'[A-Za-z0-9]+', license_plate):
             msg = 'License_plate must contain only characters and numbers!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif len(make) > 50 :
             msg = 'Make too long!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif len(model) > 50:
             msg = 'Model is too long!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif  not re.match(r'^\d{4}$', year) or int(year) > current_year:
             msg = 'Year is wrong!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif not re.match(r'^[1-9]\d*$', seating_capacity) :
             msg = 'Seating capacity is wrong!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif not re.match(r'^\d+(\.\d+)?$', price_per_day):
             msg = 'Invalid price!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif float(price_per_day)<0:
             msg = 'Invalid price!'
-            return render_template("car_add.html", username = session.get('username'), user_type=user_type, msg=msg)
+            
         else:            
             cursor.execute('INSERT INTO cars (license_plate, make, model, year, seating_capacity, price_per_day, transmission) VALUES (%s, %s, %s, %s, %s, %s, %s)', (license_plate,make,model,year,seating_capacity,price_per_day,transmission))
             mysql.connection.commit()
@@ -248,39 +251,40 @@ def car_edit(car_ID):
         new_transmission = request.form.get('transmission')
         current_year = datetime.now().year
         
-        cursor.execute('SELECT license_plate FROM cars WHERE car_ID <> %s', (car_ID,))
-        license_plates = cursor.fetchall()
-        print(license_plates)
-        if new_license_plate in license_plates:
+        cursor.execute('SELECT license_plate FROM cars WHERE license_plate = %s AND car_ID <> %s', (new_license_plate, car_ID,))
+        result = cursor.fetchall()
+        
+        if result:
             msg = 'This license_plate already exists!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
+            
         elif len(new_license_plate) > 15:
             msg = 'License_plate is too long!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
         elif not re.match(r'[A-Za-z0-9]+', new_license_plate):
             msg = 'License_plate must contain only characters and numbers!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
         elif len(new_make) > 50 :
             msg = 'Make too long!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
         elif len(new_model) > 50:
             msg = 'Model is too long!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
         elif  not re.match(r'^\d{4}$', new_year):  
             msg = 'Year is wrong!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
         elif int(new_year) > current_year:
             msg = 'Year is wrong!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
-        elif re.match(r'^[1-9]\d*$', new_seating_capacity) :
+            
+        elif not re.match(r'^[1-9]\d*$', new_seating_capacity) :
             msg = 'Seating capacity is wrong!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
         elif not re.match(r'^\d+(\.\d+)?$', new_price_per_day):
             msg = 'Invalid price!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
         elif float(new_price_per_day)<0:
             msg = 'Invalid price!'
-            return render_template("car_edit.html", username = session.get('username'), car_details=car_details,user_type=user_type, msg=msg)
+            
         else:
             cursor.execute('UPDATE cars SET license_plate=%s, make=%s, model=%s, year=%s, seating_capacity=%s, price_per_day=%s, transmission=%s WHERE car_ID=%s', (new_license_plate,new_make,new_model,new_year,new_seating_capacity,new_price_per_day,new_transmission, car_ID))
             mysql.connection.commit()
@@ -329,47 +333,49 @@ def customer_edit(user_ID):
         new_customer_email = request.form.get('customer_email')
         new_customer_phone_number = request.form.get('customer_phone_number')
 
-        cursor.execute('SELECT username FROM users WHERE user_ID <> %s', (user_ID,))
-        usernames = cursor.fetchall()
+        cursor.execute('SELECT username FROM users WHERE username = %s AND user_ID <> %s',  (new_username,user_ID,))
+        result = cursor.fetchall()
 
-        if new_username in usernames:
+        if result:
             msg = 'This username already exists!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+               
         elif len(new_username) > 50:
             msg = 'Username is too long!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif not re.match(r'[A-Za-z0-9]+', new_username):
             msg = 'Username must contain only characters and numbers!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif len(new_customer_first_name) > 50 or len(new_customer_last_name) > 50 :
             msg = 'Name too long!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif not re.match(r'^[a-zA-Z]+$', new_customer_first_name) :
             msg = 'Name not just letters!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif not  re.match(r'^[a-zA-Z]+$', new_customer_last_name):
             msg = 'Name not just letters!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif len(new_customer_address) > 250:
             msg = 'Adress is too long!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif len(new_customer_email) > 50:
             msg = 'Email address is too long!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', new_customer_email):
             msg = 'Invalid email address!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif len(new_customer_phone_number) > 20:
             msg = 'Phone number is too long!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         elif not re.match(r'^\d+$', new_customer_phone_number):
             msg = 'Invalid phone number!'
-            return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
+            
         else:
             cursor.execute('UPDATE users SET username=%s, email=%s WHERE user_ID=%s', (new_username, new_customer_email,user_ID))
+            
             cursor.execute('UPDATE customers SET customer_first_name=%s, customer_last_name=%s, customer_address=%s, customer_phone_number=%s WHERE user_ID=%s', (new_customer_first_name,new_customer_last_name,new_customer_address,new_customer_phone_number, user_ID))
             mysql.connection.commit()
             cursor.close()
+            
             return redirect(url_for('routes.customer_list'))
     
     return render_template("customer_edit.html", username = session.get('username'), user_ID=session.get('user_ID'),customer_details=customer_details, user_type=user_type, msg=msg)
@@ -380,8 +386,7 @@ def customer_add():
     user_type=session.get('user_type')
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
-        print(request.form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:        
         # Create variables for easy access
         username = request.form.get('username')
         password = request.form.get('password')
@@ -391,41 +396,41 @@ def customer_add():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         account = cursor.fetchone()
-        print(account)
+        
         # If account exists show error and validation checks
         if account:
             msg = 'Account already exists!'
-            return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif len(username) > 50:
             msg = 'Username is too long!'
-            return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif not re.match(r'[A-Za-z0-9]+', username):
             msg = 'Username must contain only characters and numbers!'
-            return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
+            
         
         elif len(password) < 6 or len(password) > 20:
             msg = 'Password must be between 6 and 20 characters!'
-            return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
+            
         # Check is there any space in password
         elif re.search(r'\s', password):
             msg = 'Password cannot contain spaces!'
-            return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif len(email) > 50:
             msg = 'Email address is too long!'
-            return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
+            
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             msg = 'Invalid email address!'
-            return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
+            
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             try:
                 cursor = mysql.connection.cursor()
-                cursor.execute('INSERT INTO users (username, password, email, user_type) VALUES (%s, %s,%s, %s)', (username, hashed, email, 'customer'))
+                cursor.execute('INSERT INTO users (username, password, email, user_type) VALUES (%s, %s,%s, %s)', (username, hashed, email, 'customer',))
                 mysql.connection.commit()
                 #Get the user_ID
                 user_ID = cursor.lastrowid
-                cursor.execute('INSERT INTO customers (user_ID, customer_first_name, customer_last_name, customer_phone_number ) VALUES (%s, %s, %s, %s)', (user_ID, 'customer', 'customer', '0000000'))
+                cursor.execute('INSERT INTO customers (user_ID, customer_first_name, customer_last_name, customer_phone_number ) VALUES (%s, %s, %s, %s)', (user_ID, 'customer', 'customer', '0000000',))
                 mysql.connection.commit()
             except Exception as e:
                 # Something went wrong, rollback the transaction
@@ -437,8 +442,8 @@ def customer_add():
             # flash('You have successfully add a customer!'  'success') 
             # Redirect to customer_list page after successful registration
             return  redirect(url_for('routes.customer_list'))
-    else:
-        return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
+   
+    return render_template('customer_add.html',  username = session.get('username'), user_type=user_type, msg=msg)
 
 @routes.route("/customer_delete/<int:user_ID>")
 @admin_required
@@ -467,6 +472,7 @@ def staff_edit(user_ID):
     cursor = mysql.connection.cursor()
     cursor.execute('SELECT u.user_ID, u.username, u.email, s.staff_first_name, s.staff_last_name, s.staff_address, s.staff_phone_number FROM users u JOIN staffs s ON u.user_ID=s.user_ID WHERE u.user_ID=%s', (user_ID,))
     staff_details=cursor.fetchone()
+    msg=''
 
     if request.method == 'POST':
         new_username = request.form.get('username')
@@ -476,35 +482,36 @@ def staff_edit(user_ID):
         new_staff_email = request.form.get('email')
         new_staff_phone_number = request.form.get('staff_phone_number')
 
-        cursor.execute('SELECT username FROM users WHERE user_ID <> %s', (user_ID,))
-        usernames = cursor.fetchall()
-        if new_username in usernames:
+        cursor.execute('SELECT username FROM users WHERE username = %s AND user_ID <> %s',  (new_username, user_ID,))
+        result = cursor.fetchall()
+
+        if result:
             msg = 'This username already exists!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         elif len(new_username) > 50:
             msg = 'Username is too long!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         elif not re.match(r'[A-Za-z0-9]+', new_username):
             msg = 'Username must contain only characters and numbers!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         elif len(new_staff_first_name) > 50 or len(new_staff_last_name) > 50 :
             msg = 'Name too long!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         elif len(new_staff_address) > 250:
             msg = 'Adress is too long!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         elif len(new_staff_email) > 50:
             msg = 'Email address is too long!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', new_staff_email):
             msg = 'Invalid email address!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         elif len(new_staff_phone_number) > 20:
             msg = 'Phone number is too long!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         elif not re.match(r'^\d+$', new_staff_phone_number):
             msg = 'Invalid phone number!'
-            return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+            
         else:
             cursor.execute('UPDATE users SET username=%s, email=%s WHERE user_ID=%s', (new_username, new_staff_email, user_ID))
             cursor.execute('UPDATE staffs SET staff_first_name=%s, staff_last_name=%s, staff_address=%s, staff_phone_number=%s WHERE user_ID=%s', (new_staff_first_name,new_staff_last_name,new_staff_address,new_staff_phone_number, user_ID))
@@ -512,7 +519,7 @@ def staff_edit(user_ID):
             cursor.close()
             return redirect(url_for('routes.staff_list'))
     
-    return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type)
+    return render_template("staff_edit.html", staff_details=staff_details,username = session.get('username'), user_type=user_type, msg=msg)
 
 
 @routes.route("/staff_add", methods=['GET', 'POST'])
@@ -535,29 +542,29 @@ def staff_add():
         # If account exists show error and validation checks
         if account:
             msg = 'Account already exists!'
-            return render_template('staff_add.html', msg=msg, username = session.get('username'), user_type=user_type)
+            
         elif len(username) > 50:
             msg = 'Username is too long!'
-            return render_template('staff_add.html', msg=msg, username = session.get('username'), user_type=user_type)
+            
         elif not re.match(r'[A-Za-z0-9]+', username):
             msg = 'Username must contain only characters and numbers!'
-            return render_template('staff_add.html', msg=msg, username = session.get('username'), user_type=user_type)
+            
         elif not username or not password:
             msg = 'Please fill out the form!'
-            return render_template('staff_add.html', msg=msg, username = session.get('username'), user_type=user_type)
+            
         elif len(password) < 6 or len(password) > 20:
             msg = 'Password must be between 6 and 20 characters!'
-            return render_template('staff_add.html', msg=msg, username = session.get('username'), user_type=user_type)
+            
         # Check is there any space in password
         elif re.search(r'\s', password):
             msg = 'Password cannot contain spaces!'
-            return render_template('staff_add.html', msg=msg, username = session.get('username'), user_type=user_type)
+            
         elif len(email) > 50:
             msg = 'Email address is too long!'
-            return render_template('staff_add.html', msg=msg, username = session.get('username'), user_type=user_type)
+            
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             msg = 'Invalid email address!'
-            return render_template('staff_add.html', msg=msg, username = session.get('username'), user_type=user_type)
+            
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
