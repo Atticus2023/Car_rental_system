@@ -13,6 +13,7 @@
 
 <div class="row row-cols-1 row-cols-md-5 g-3">
     {% for staff in staffs %}
+    {% if staff[0] != 1 %}
     
     <div class="col">
         <div class="card">
@@ -24,17 +25,16 @@
                 <p>Email: {{staff[2]}}</p>
                 <p>Phone number: {{staff[6]}}</p>
 
-                {% if staff[0] == 1 %}
-                <a href="{{url_for('routes.staff_edit', user_ID=staff[0]) }}" class="card-link">Edit</a>
-                {% else %}
+                
                 <a href="{{url_for('routes.staff_edit', user_ID=staff[0]) }}" class="card-link">Edit</a>
                 <a href="{{url_for('routes.staff_delete', user_ID=staff[0]) }}" class="card-link">Delete</a>
                 
-                {% endif %}
+               
             </div>
 
         </div>
     </div>
+    {% endif %}
     {% endfor %}
 
 {% endblock %}
