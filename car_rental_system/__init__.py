@@ -9,8 +9,6 @@ mysql = MySQL()
 def creat_app():
     app = Flask(__name__)
 
-    
-
     app.secret_key = "car_rental_system"
     
     # Database connection details below

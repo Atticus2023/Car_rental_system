@@ -92,12 +92,14 @@ def login():
                 session['username'] = account['username']
                 session['user_type'] = account['user_type']
                 session['email'] = account['email']
-                if session['user_type'] == 'admin':
-                    return render_template("admin_dashboard.html", username = username)
-                elif session['user_type'] == 'staff':
-                    return render_template("staff_dashboard.html", username = username)
-                elif session['user_type'] == 'customer':
-                    return render_template("customer_dashboard.html", username = username)
+                
+                return render_template("base_routes.html", user_type=session['user_type'],username = username)
+                # if session['user_type'] == 'admin':
+                #     return render_template("admin_dashboard.html", username = username)
+                # elif session['user_type'] == 'staff':
+                #     return render_template("staff_dashboard.html", username = username)
+                # elif session['user_type'] == 'customer':
+                #     return render_template("customer_dashboard.html", username = username)
             else:
                 #password incorrect
                 msg = 'Incorrect password!'
